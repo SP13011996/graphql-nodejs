@@ -1,6 +1,7 @@
 import express from 'express'
 import { expressMiddleware } from "@apollo/server/express4";
 import { createApolloGrapqlServer } from './graphql'
+import { UserService } from './services/user';
 
 const cors = require('cors');
 const corsOptions = {
@@ -23,7 +24,15 @@ const init = async () => {
 
     app.use(
         "/graphql",
-        expressMiddleware(await createApolloGrapqlServer())
+        expressMiddleware(await createApolloGrapqlServer(), {
+            context: async ({ req }) => {
+                const token = req.headers["token"]
+                if (token) {
+                    const user = UserService.decodeToken(token as string)
+                    return { user }
+                }
+            }
+        })
     );
 
     app.listen(PORT, () => console.log(`Server started at PORT:${PORT}`));

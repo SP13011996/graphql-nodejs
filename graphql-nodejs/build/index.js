@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express4_1 = require("@apollo/server/express4");
 const graphql_1 = require("./graphql");
+const user_1 = require("./services/user");
 const cors = require('cors');
 const corsOptions = {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -27,7 +28,15 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
         res.json({ message: "Server is up and running" });
     });
     app.use(cors(corsOptions));
-    app.use("/graphql", (0, express4_1.expressMiddleware)(yield (0, graphql_1.createApolloGrapqlServer)()));
+    app.use("/graphql", (0, express4_1.expressMiddleware)(yield (0, graphql_1.createApolloGrapqlServer)(), {
+        context: ({ req }) => __awaiter(void 0, void 0, void 0, function* () {
+            const token = req.headers["token"];
+            if (token) {
+                const user = user_1.UserService.decodeToken(token);
+                return { user };
+            }
+        })
+    }));
     app.listen(PORT, () => console.log(`Server started at PORT:${PORT}`));
 });
 init();

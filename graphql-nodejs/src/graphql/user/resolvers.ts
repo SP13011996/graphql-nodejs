@@ -1,39 +1,28 @@
 import { prismaClient } from '../../lib/db';
-const { v4: uuidv4 } = require('uuid');
+import { CreateUserPayload, GetUseTokenPayload, UserService } from '../../services/user';
 
 const queries = {
-    getUser: async () => {
-        const data = await prismaClient.user.findMany({
+    getUser: async (_: any, __: any, context: any) => {
+
+        /* const data = await prismaClient.user.findMany({
             include: {
                 todos: true
             }
-        })
+        }) */
+        console.log(context)
+        const data = await UserService.getUserById(context.user.id)
         return data
+    },
+    getUserToken: async (_: any, payload: GetUseTokenPayload) => {
+        const response = await UserService.getUserToken(payload)
+        return response
     }
 }
 
 const mutations = {
-    createUser: async (_: any, { name }: { name: string }) => {
-        const newUUID = uuidv4();
-        await prismaClient.user.create({
-            data: {
-                Id: newUUID,
-                Name: name,
-                todos: {
-                    create: [
-                        {
-                            Id: uuidv4(),
-                            Description: "some random desc"
-                        },
-                        {
-                            Id: uuidv4(),
-                            Description: "some random desc"
-                        }
-                    ]
-                }
-            }
-        })
-        return newUUID
+    createUser: async (_: any, payload: CreateUserPayload) => {
+        const response = await UserService.createUser(payload)
+        return response
     }
 
 }

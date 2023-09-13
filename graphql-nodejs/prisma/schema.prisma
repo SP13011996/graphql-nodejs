@@ -11,9 +11,11 @@ datasource db {
 }
 
 model User {
-  Id    String @id
-  Name  String
-  todos Todo[]
+  Id       String  @id
+  Name     String  @unique
+  Password String?
+  salt     String?
+  todos    Todo[]
 }
 
 model Todo {
@@ -23,6 +25,12 @@ model Todo {
   user        User   @relation(fields: [userId], references: [Id])
 }
 
-model Testing {
-  Id String @id
+model Test1 {
+  Id    String  @id
+  test2 Test2[]
+}
+
+model Test2 {
+  Id    String  @id
+  test1 Test1[]
 }

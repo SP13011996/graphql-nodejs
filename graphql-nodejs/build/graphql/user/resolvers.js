@@ -10,40 +10,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
-const db_1 = require("../../lib/db");
-const { v4: uuidv4 } = require('uuid');
+const user_1 = require("../../services/user");
 const queries = {
-    getUser: () => __awaiter(void 0, void 0, void 0, function* () {
-        const data = yield db_1.prismaClient.user.findMany({
+    getUser: (_, __, context) => __awaiter(void 0, void 0, void 0, function* () {
+        /* const data = await prismaClient.user.findMany({
             include: {
                 todos: true
             }
-        });
+        }) */
+        console.log(context);
+        const data = yield user_1.UserService.getUserById(context.user.id);
         return data;
+    }),
+    getUserToken: (_, payload) => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield user_1.UserService.getUserToken(payload);
+        return response;
     })
 };
 const mutations = {
-    createUser: (_, { name }) => __awaiter(void 0, void 0, void 0, function* () {
-        const newUUID = uuidv4();
-        yield db_1.prismaClient.user.create({
-            data: {
-                Id: newUUID,
-                Name: name,
-                todos: {
-                    create: [
-                        {
-                            Id: uuidv4(),
-                            Description: "some random desc"
-                        },
-                        {
-                            Id: uuidv4(),
-                            Description: "some random desc"
-                        }
-                    ]
-                }
-            }
-        });
-        return newUUID;
+    createUser: (_, payload) => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield user_1.UserService.createUser(payload);
+        return response;
     })
 };
 exports.resolvers = { queries, mutations };
